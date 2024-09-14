@@ -1,0 +1,67 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+{% if err_msg %}
+<div class="alert alert-warning">
+    {{err_msg}}
+</div>
+{% endif %}
+
+{% if current_user.is_authenticated %}
+<h2 class="text-info mt-1">Chào mừng bạn {{ current_user.username }} quay lại!!!</h2>
+
+<div class="row">
+    <div class="col-md-5 col-12">
+        <table class="table">
+            <tr>
+                <th>Id</th>
+                <th>Tên tuyến bay</th>
+                <th>Số lượt bay</th>
+            </tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s[0] }}</td>
+                <td>{{ s[1] }}</td>
+                <td>{{ s[2] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-7 col-12">
+        <canvas id="myChart"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/stats.js') }}" ></script>
+<script>
+    let labels = [];
+    let data = [];
+    {% for s in stats %}
+        data.push({{ s[2] }});
+        labels.push('{{ s[1] }}');
+    {% endfor %}
+    window.onload = function() {
+        drawChart("pie", data, labels)
+    }
+</script>
+
+{% else %}
+<h1 class="text-center text-info mt-3">ĐĂNG NHẬP</h1>
+<form method="post" action="/admin-login">
+    <div class="form-group mb-3 mt-3">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username"
+               pattern="[a-zA-Z0-9]+" required/>
+    </div>
+
+    <div class="form-group mt-3 mb-3">
+        <label for="pwd">Mật khẩu</label>
+        <input type="password" class="form-control" id="pwd" placeholder="Mật khẩu" name="password" required/>
+    </div>
+
+    <div class="form-floating mt-3 mb-3">
+        <button class="btn btn-info" type="submit">Đăng nhập</button>
+    </div>
+</form>
+{% endif %}
+{% endblock %}
